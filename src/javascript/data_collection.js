@@ -10,6 +10,7 @@ const rollingNumber = 20;
 const backToBackCount = 2;
 
 const userLocation = {latitude: undefined, longitude: undefined};
+let locationRequestInProgress = false;
 
 const localData = {};
 const runCycle = async function () {
@@ -129,10 +130,14 @@ const startCollection = async function () {
 };
 
 const geoLocate = function() {
-	navigator.geolocation.getCurrentPosition(position => {
+	if (!locationRequestInProgress && (userLocation.latitude === undefined || userLocation.longitude === undefined)) {
+		locationRequestInProgress = true;
+		navigator.geolocation.getCurrentPosition(position => {
 			userLocation.latitude = position.coords.latitude.toFixed(2);
 			userLocation.longitude = position.coords.longitude.toFixed(2);
-	});
+			locationRequestInProgress = false;
+		});
+	}
 };
 
 // Enter point
