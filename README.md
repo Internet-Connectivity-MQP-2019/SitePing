@@ -1,5 +1,7 @@
 # Mapping Internet Connectivity
 
+![Build status](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibTR3VGx4S0xvMzYwTjFGQkpoVndoQUVjdVlmTTl3UVhpUGtScVNnVnl6WWtmZ1l4TW5temxpK2o4QnhOWldrdmJWN2RYajRIKzUza3k1NUc0YVIxRHpRPSIsIml2UGFyYW1ldGVyU3BlYyI6ImlCTmUyYUJQL3BSK21yaVciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+
 Team (github username):
 * Evan Goldstein (evanbg-wpi)
 * David Vollum (davidvollum)

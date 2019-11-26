@@ -3,17 +3,19 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      node: 10
+      nodejs: 10
   build:
     commands:
       - aws s3 cp s3://private-conf/mqp-site-ping/GeoIP2-City.zip .
-  artifacts:
-    files:
-      - src/*
-      - .babelrc
-      - *.js
-      - package.json
-      - package-lock.json
-      - socket.js
-    name: eb-build
-    discard-paths: no
+artifacts:
+  files:
+    - src/*
+    - dist/*
+    - .babelrc
+    - ./*.js
+    - package.json
+    - package-lock.json
+    - GeoIP2-City.zip
+  name: eb-build
+  discard-paths: no
+
