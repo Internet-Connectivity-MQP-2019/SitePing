@@ -9,8 +9,8 @@ phases:
       - aws s3 cp s3://private-conf/mqp-site-ping/GeoIP2-City.zip .
 artifacts:
   files:
-    - src/*
-    - dist/*
+    - src/**/*
+    - dist/**/*
     - .babelrc
     - ./*.js
     - package.json

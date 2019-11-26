@@ -1,7 +1,6 @@
 /dist/deletion-bundle.js
 /dist/main-bundle.js
 /dist/bundle.js
-package-lock.json
 /node_modules/*
 /.idea/*
 GeoIP2-City.mmdb
