@@ -4,14 +4,15 @@ phases:
   install:
     runtime-versions:
       nodejs: 10
+    commands:
+      - npm install
   build:
     commands:
+      - npm run-script build
       - aws s3 cp s3://private-conf/mqp-site-ping/GeoIP2-City.zip .
 artifacts:
   files:
-    - src/**/*
     - dist/**/*
-    - .babelrc
     - ./*.js
     - package.json
     - package-lock.json
