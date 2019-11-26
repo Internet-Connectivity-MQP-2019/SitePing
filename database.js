@@ -68,11 +68,12 @@ module.exports = function () {
 
     function getLocation(data) {
         return new Promise((resolve) => {
-            let onWifi = data.connectionInfo.type === 'wifi';
+            let onWifi = (data.connectionInfo !== undefined && data.connectionInfo.type === 'wifi');
             if ((data.isMobile && onWifi) || !data.isMobile)
                 maxMindLookup(data.ip).then(location => resolve(location));
             else if (data.isMobile && !onWifi && data.latitude && data.longitude)
                 reverseGeocode(data.latitude, data.longitude).then(location => resolve(location));
+            else resolve({latitude: 0, longitude: 0, city: "null", state: "null", country: "null"});
         });
     }
 
