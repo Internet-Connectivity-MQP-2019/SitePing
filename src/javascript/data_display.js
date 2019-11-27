@@ -105,6 +105,7 @@ const displayBar = function (raw_data) {
         .attr("class", "bar")
         .attr("x", 0)
         .attr("opacity", 0)
+        .attr("id", (d,i) => `barChartRect_${i}`)
         .attr("height", y.bandwidth())
         .attr("width", function (d) {
             return x(d.value);
@@ -113,6 +114,7 @@ const displayBar = function (raw_data) {
     //Add value labels
     newRow.append("text")
         .attr("class", "label")
+        .attr("fill", "#fff")
         .attr("y", y.bandwidth() / 2)
         .attr("x", 0)
         .attr("opacity", 1)
@@ -124,11 +126,37 @@ const displayBar = function (raw_data) {
     newRow.append("text")
         .attr("class", "category")
         .attr("text-overflow", "ellipsis")
+        .attr("fill", "#0367A5")
         .attr("y", y.bandwidth() / 2)
         .attr("x", categoryIndent)
         .attr("opacity", 0)
         .attr("dy", ".35em")
         .attr("dx", "0.5em")
+        .on("click", d => {
+            currentFavicon = d.key.split(" ")[0];
+            document.querySelector("#selected_favicon_display").textContent = d.key.split(" ")[0];
+            updateMap();
+        })
+        .text(function (d) {
+            return d.key
+        });
+
+    newRow.append("clipPath")
+        .attr("id", (d,i) => `clipPath_${i}`)
+        .append("use")
+        .attr("xlink:href", (d,i) => `#barChartRect_${i}`);
+
+    //Add Headlines, but white this time
+    newRow.append("text")
+        .attr("class", "category")
+        .attr("text-overflow", "ellipsis")
+        .attr("fill", "#fff")
+        .attr("y", y.bandwidth() / 2)
+        .attr("x", categoryIndent)
+        .attr("opacity", 1)
+        .attr("dy", ".35em")
+        .attr("dx", "0.5em")
+        .style("clip-path", (d, i) => `url("#clipPath_${i}")`)
         .on("click", d => {
             currentFavicon = d.key.split(" ")[0];
             document.querySelector("#selected_favicon_display").textContent = d.key.split(" ")[0];
