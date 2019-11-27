@@ -12,6 +12,21 @@ const backToBackCount = 2;
 const userLocation = {latitude: undefined, longitude: undefined};
 let locationRequestInProgress = false;
 
+/**
+ * Shuffles array in place.
+ * @param {Array} a items An array containing the items.
+ */
+function shuffle(a) {
+	let j, x, i;
+	for (i = a.length - 1; i > 0; i--) {
+		j = Math.floor(Math.random() * (i + 1));
+		x = a[i];
+		a[i] = a[j];
+		a[j] = x;
+	}
+	return a;
+}
+
 const localData = {};
 const runCycle = async function () {
 	const newData = [];
@@ -52,10 +67,11 @@ const runCycle = async function () {
 	}
 
 	console.log("Running cycle");
-	for (let i = 0; i < domains.length; i += 1) {
+	const local_domains = shuffle(domains)
+	for (let i = 0; i < local_domains.length; i += 1) {
 		if (stopped) break;
 
-		const domain = domains[i];
+		const domain = local_domains[i];
 
 		for (let c = 0; c < backToBackCount; c += 1) {
 			await ping(domain.domain)
