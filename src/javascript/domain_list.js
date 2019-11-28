@@ -1,7 +1,7 @@
 // Domains to ping
 // Source: https://www.alexa.com/topsites/countries/US
 const domains = [
-	{name: "Google", domain: "https://www.google.com/favicon.ico", rank: 1},
+	{name: "Google", domain: "https://www.google.com/images/searchbox/desktop_searchbox_sprites302_hr.webp", rank: 1},
 	{name: "Youtube", domain: "https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png", rank: 2},
 	{name: "Amazon", domain: "https://www.amazon.com/empty.gif", rank: 3},
 	{name: "Yahoo", domain: "https://s.yimg.com/os/mit/ape/m/81f43c2/t.gif", rank: 4},
@@ -12,7 +12,7 @@ const domains = [
 	{name: "Office", domain: "https://a.fp.measure.office.com/apc/trans.gif", rank: 9},
 	{name: "Bing", domain: "https://www.bing.com/favicon.ico", rank: 10},
 	{name: "Netflix", domain: "https://help.nflxext.com/helpcenter/fc264264a231904b0fce67cd98399e10.svg", rank: 11},
-	{name: "ESPN", domain: "https://secure.espncdn.com/combiner/i?img=/photo/2019/1126/tigerwoods1_ms_16x9.jpg", rank: 12},
+	{name: "ESPN", domain: "https://a.espncdn.com/combiner/i?img=%2Fi%2Fespn%2Fnetworks_shows%2F500%2Fundefeated.png&w=60&h=60&scale=crop&cquality=80&location=origin", rank: 12},
 	{name: "Salesforce", domain: "https://c1.sfdcstatic.com/etc/clientlibs/sfdc-aem-master/clientlibs_base/imgs/spacer.gif", rank: 13}, /* Salesforce */
 	{name: "Live", domain: "https://logincdn.msauth.net/16.000.28394.11/images/ellipsis_grey.svg", rank: 14},
 	{name: "Instructure", domain: "https://www.instructure.com/sites/blog.instructure/files/uploaded-assets/menu/logo/starter.svg", rank: 15},
