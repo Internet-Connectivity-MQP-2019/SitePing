@@ -46,7 +46,11 @@ const runCycle = async function () {
 			img.onerror = function () {
 				reject(url + " is bad.");
 			};
-			img.src = "https://" + url + '?nocache=' + Math.floor((1 + Math.random()) * 0x10000).toString(16);
+			if (url.indexOf("?") !== -1) {
+				img.src = url + '&nocache=' + Math.floor((1 + Math.random()) * 0x10000).toString(16);
+			} else {
+				img.src = url + '?nocache=' + Math.floor((1 + Math.random()) * 0x10000).toString(16);
+			}
 		});
 	}
 
