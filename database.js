@@ -22,16 +22,18 @@ module.exports = function () {
         return new Promise((resolve, reject) => {
             let request = new XMLHttpRequest();
             request.onreadystatechange = () => {
-                console.log('readyStatechange:  ' + request.readyState);
+                // console.log('readyStatechange:  ' + request.readyState);
             };
             request.onload = () => {
                 if (request.status >= 200 && request.status < 400) {
                     let data = JSON.parse(request.responseText);
-                    if (data['QueryStatusCode'] !== 'Success') reject("Reverse Geocode lookup failed: " + data['ErrorMessage']);
+                    if (data['QueryStatusCode'] !== 'Success') reject("(" + new Date () + ") Reverse Geocode lookup failed: " + data['ErrorMessage']);
                     let address = data['StreetAddresses'][0];
                     resolve({
                         city: address['City'],
                         state: address['State'],
+                        latitude: latitude,     // End user function expects latitude and longitude to be included (since maxmind provides in other scenario)
+                        longitude: longitude,
                         country: 'US'
                     })
                 } else reject("Reverse Geocode lookup failed with API status code " + request.status + ": " + request.responseText);
@@ -78,10 +80,6 @@ module.exports = function () {
     }
 
     return {
-        deleteAll: function () {
-            return PingsCollection().then(collection => collection.remove({}));
-        },
-
         locationLookup: function (data) {
             return new Promise(resolve => resolve(getLocation(data[0])))
         },
@@ -103,7 +101,7 @@ module.exports = function () {
                         data[i].country = location.country;
                     }
                     PingsCollection().then(col => col.insertMany(data).then(resolve));
-                }).catch(error => reject("Error getting GeoIP info: " + error));
+                }).catch(error => reject("(" + new Date () + ") Error getting GeoIP info: " + error));
             });
         },
         // returns [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]

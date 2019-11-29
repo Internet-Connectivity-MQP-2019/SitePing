@@ -18,5 +18,5 @@ const io = require('socket.io')(http);
 require('./socket.js')(io);
 
 const listener = http.listen(process.env.PORT, function() {
-	console.log('Your app is running. Go to http://localhost:' + listener.address().port + '/index.html');
+	console.log('(' + new Date() + ') Your app is running. Go to http://localhost:' + listener.address().port + '/index.html');
 });
