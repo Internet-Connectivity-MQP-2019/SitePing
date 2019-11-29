@@ -353,22 +353,11 @@ const updateMap = function () {
 
     mapPoint.transition().duration(0)
         .attr("cx", function (d) {
-            const cx = projection([d.longitude, d.latitude])[0];
-
-            if (cx === null) {
-                console.log(d);
-            }
-
-            return cx;
+            console.log(d, [d.longitude, d.latitude], projection([d.longitude, d.latitude]));
+            return projection([d.longitude, d.latitude])[0]
         })
         .attr("cy", function (d) {
-            const cy = projection([d.longitude, d.latitude])[1];
-
-            if (cy === null) {
-                console.log(d);
-            }
-
-            return cy;
+            return projection([d.longitude, d.latitude])[1]
         })
         .attr("r", 10)
         .style("fill", function (d) {
