@@ -340,7 +340,8 @@ const updateMap = function () {
             div.transition()
                 .duration(200)
                 .style("opacity", .9);
-            div.html(d.city + "<br>" + Math.round(d.avg_rtt) + " ms")
+            let city = (d.city === undefined || d.city === null || d.city === "") ? "<span style='font-style:italic'>No City</span>" : d.city;
+            div.html(city + "<br>" + Math.round(d.avg_rtt) + " ms")
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px")
                 .style("font-size", "15px")
