@@ -358,7 +358,7 @@ const updateMap = function () {
         .attr("cy", function (d) {
             return projection([d.longitude, d.latitude])[1]
         })
-        .attr("r", 10)
+        .attr("r", 7)
         .style("fill", function (d) {
             return scaledGradient(d.avg_rtt)
         });
