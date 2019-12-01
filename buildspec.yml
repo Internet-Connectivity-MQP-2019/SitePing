@@ -10,7 +10,6 @@ phases:
     commands:
       - npm run-script build
       - aws s3 cp s3://private-conf/mqp-site-ping/GeoIP2-City.zip .
-      - aws cloudfront create-invalidation --distribution-id=E4DFOF0TZ62T4 --paths '/*'
 artifacts:
   files:
     - dist/**/*

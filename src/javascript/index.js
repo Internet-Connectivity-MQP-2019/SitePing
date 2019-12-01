@@ -4,7 +4,7 @@ import "./data_collection"
 
 import "@babel/polyfill"
 
-const socket = io(window.location.origin, {'transports': ['websocket', 'polling']});
+const socket = io();
 
 socket.emit('getUserCount');
 
