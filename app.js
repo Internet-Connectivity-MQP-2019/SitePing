@@ -14,7 +14,7 @@ app.use(express.static('dist'));
 
 // Setup socket.io
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http, {'transports': ['websocket', 'polling']});
 require('./socket.js')(io);
 
 const listener = http.listen(process.env.PORT, function() {
