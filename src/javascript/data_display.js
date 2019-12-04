@@ -311,6 +311,8 @@ const setupMap = function (width, height) {
 
 };
 
+
+
 // data = [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
 const updateMap = function () {
 
@@ -340,7 +342,12 @@ const updateMap = function () {
             div.transition()
                 .duration(200)
                 .style("opacity", .9);
-            div.html(d.city + "<br>" + Math.round(d.avg_rtt) + " ms")
+            const city = (d.city === undefined || d.city === null || d.city === "") ?
+				"<span style='font-style:italic'>No City</span>" :
+				d.city
+					.replace(/\b\w/g, function(l){ return l.toUpperCase() })   // Replace first letters of all words with uppercase letters. \b finds the boundary characters (first letters) of all words found by \w
+					.replace(/\B\w/g, function(l){ return l.toLowerCase() });  // Replace non-first letters of all words with lowercase letters. \B finds the non-boundary characters of all words found by \w
+            div.html(city + "<br>" + Math.round(d.avg_rtt) + " ms")
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px")
                 .style("font-size", "15px")
@@ -353,7 +360,6 @@ const updateMap = function () {
 
     mapPoint.transition().duration(0)
         .attr("cx", function (d) {
-            console.log(d, [d.longitude, d.latitude], projection([d.longitude, d.latitude]));
             return projection([d.longitude, d.latitude])[0]
         })
         .attr("cy", function (d) {
