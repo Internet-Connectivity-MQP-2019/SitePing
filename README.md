@@ -42,7 +42,7 @@ Note: to collect data and see the bar chart in action, you must click "Start" an
 * Sam: Socket.io implementation and data collection
 
 
-#Template email
+## Template email
 
 Hello PERSON,
 
