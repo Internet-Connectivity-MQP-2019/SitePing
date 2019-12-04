@@ -47,9 +47,9 @@ Note: to collect data and see the bar chart in action, you must click "Start" an
 Hello PERSON,
 
 I am currently in the middle of my culminating senior project called my (MQP).
-My team and I are working to map internet connectivity across the US. Our method data collection method involves distributing a website to volunteers (like yourself), across the US and asking them if we can collect data about your internet speeds. 
+My team and I are working to map internet connectivity across the US. One method data collection method involves distributing a website to volunteers (like yourself), across the US and asking them if we can collect data about your internet speeds. 
 With these techniques we will map internet connectivity across the United States, providing valuable information to network architects, everyday users of the internet, and many others.
-No personally identifying information except for your IP address will be collected.
+No personally identifying information except for your approximate location (accurate only to +/- 5 miles) and IP address will be collected.
 
 To help us out, open this link, <a href=https://connection-to-the.net>connection-to-the.net</a>, and click the green start button.
 In order to collect data most effectively, please leave the site open for at least 5 minutes. If you have any questions feel free to reach out to me at EMAIL. 
