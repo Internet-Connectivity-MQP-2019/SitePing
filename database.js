@@ -134,6 +134,37 @@ module.exports = function () {
 					resolve(res);
 				})
 			));
+		},
+		getTopCities: function (numTop) {
+			return new Promise(resolve => PingsCollection().then(col =>
+				col.aggregate([
+					{
+						$match: {
+							country: "US",
+							latitude: {$exists: true, $ne: null},
+							longitude: {$exists: true, $ne: null},
+							city: {$exists: true, $ne: null},
+							state: {$exists: true, $ne: null}
+						}
+					},
+					{
+						$group:
+							{_id: {state: "$state", city: "$city", ip: "$ip"},
+							total: {$sum: 1}}
+					},
+					{
+						$group:
+							{
+								_id: {state: "$_id.state", city: "$_id.city"},
+								count: {$sum: 1}
+							}
+					},
+					{$sort: {count: -1}},
+					{$limit: numTop}
+				]).toArray((err, res) => {
+					resolve(res);
+				})
+			));
 		}
 	};
 };

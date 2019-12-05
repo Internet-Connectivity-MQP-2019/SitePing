@@ -275,6 +275,7 @@ const setupMap = function (width, height) {
 
         socket.emit('getData');
         socket.emit('getData');
+        socket.emit('getTopCities');
 
     });
 
@@ -383,4 +384,17 @@ const updateMapData = function (newData) {
     updateMap();
 };
 
-export default {displayBar, updateMap, initializeBar, updateMapData, setupMap}
+// Given a list of rankings, put them into the ordered list under the map
+const updateTopCities = function (rankings) {
+    const leaderboard = document.querySelector("#cityLeaderboard");
+    leaderboard.innerHTML = "";
+    rankings.forEach(item => {
+        const city = item["_id"]["city"]
+            .replace(/\b\w/g, function(l){ return l.toUpperCase() })   // Replace first letters of all words with uppercase letters. \b finds the boundary characters (first letters) of all words found by \w
+            .replace(/\B\w/g, function(l){ return l.toLowerCase() });
+
+        leaderboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${item["count"]})</li>`
+    });
+};
+
+export default {displayBar, updateMap, initializeBar, updateMapData, setupMap, updateTopCities}

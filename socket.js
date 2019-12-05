@@ -1,11 +1,13 @@
 const mobile_detect = require('mobile-detect');
 
+const numTopCities = 10;
 module.exports = function (io) {
 	let userCount = 0;
 
 	const update = function() {
 		// io.emit('sendData', falseData);
 		db.getData().then((data) => io.emit('sendData', data));
+		db.getTopCities(numTopCities).then((data) => io.emit('sendTopCities', data))
 	};
 
 	const db = require('./database')(update);
@@ -44,5 +46,7 @@ module.exports = function (io) {
 		});
 
 		socket.on('getData', () => db.getData().then(data => socket.emit('sendData', data)));
+
+		socket.on('getTopCities', () => db.getTopCities(numTopCities).then(data => socket.emit('sendTopCities', data)));
 	});
 };
