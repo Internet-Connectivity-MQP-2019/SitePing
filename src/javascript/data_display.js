@@ -8,7 +8,7 @@ const d3 = Object.assign(d3Base, {group});
 let svg = null;
 let projection = null;
 let data = [];
-let currentFavicon = "Google";
+let displayMobile = true;
 let mapHeight;
 
 // data = [{favicon: '', avg: 0.0}]
@@ -132,11 +132,6 @@ const displayBar = function (raw_data) {
         .attr("opacity", 0)
         .attr("dy", ".35em")
         .attr("dx", "0.5em")
-        .on("click", d => {
-            currentFavicon = d.key.split(" ")[0];
-            document.querySelector("#selected_favicon_display").textContent = d.key.split(" ")[0];
-            updateMap();
-        })
         .text(function (d) {
             return d.key
         });
@@ -157,11 +152,6 @@ const displayBar = function (raw_data) {
         .attr("dy", ".35em")
         .attr("dx", "0.5em")
         .style("clip-path", (d, i) => `url("#clipPath_${i}")`)
-        .on("click", d => {
-            currentFavicon = d.key.split(" ")[0];
-            document.querySelector("#selected_favicon_display").textContent = d.key.split(" ")[0];
-            updateMap();
-        })
         .text(function (d) {
             return d.key
         });
@@ -254,7 +244,7 @@ const setupMap = function (width, height) {
         .attr("text-anchor", "middle")
         .attr("y", 25 + chartHeader)
         .attr("x", width / 2)
-        .text(currentFavicon);
+        .text(displayMobile ? "Mobile Data" : "Non-Mobile Data");
 
 
     d3.json("us-named.topojson").then(us => {
@@ -309,10 +299,15 @@ const setupMap = function (width, height) {
         .attr("x", 0)
         .text("0ms");
 
-
+    document.querySelector("#view_mobile").onclick = () => {setMobile(true)};
+    document.querySelector("#view_non_mobile").onclick = () => {setMobile(false)};
 };
 
-
+const setMobile = function(m) {
+    displayMobile = m;
+    updateMap();
+    document.querySelector("#selected_favicon_display").innerHTML = displayMobile ? "Mobile Data" : "Non-Mobile Data";
+};
 
 // data = [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
 const updateMap = function () {
@@ -322,7 +317,7 @@ const updateMap = function () {
         .attr('class', "tooltip")
         .style("opacity", 0);
 
-    const filtered = data.filter(d => d.favicon === currentFavicon);
+    const filtered = data.filter(d => d.isMobile === displayMobile);
     const maxValue = d3.max(filtered, d => d.avg_rtt);
     let scaledGradient = d3.scaleSequential(d3.interpolateOrRd)
     //.range(["#fff", "#BF303C"])
