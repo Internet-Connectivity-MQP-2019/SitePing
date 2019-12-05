@@ -229,16 +229,6 @@ const setupMap = function (width, height) {
         .text("Country-wide Data Aggregated by City and Website");
 
     svg.append('text')
-        .attr("class", "chart-header")
-        .attr("dominant-baseline", "hanging")
-        .attr("text-anchor", "middle")
-        .attr("font-size", 16)
-        .attr("fill", "#0367A6")
-        .attr("y", 30)
-        .attr("x", width / 2)
-        .text("Use the bar chart to select a different site");
-
-    svg.append('text')
         .attr("id", "selected_favicon_display")
         .attr("dominant-baseline", "hanging")
         .attr("text-anchor", "middle")
