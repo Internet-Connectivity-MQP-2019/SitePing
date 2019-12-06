@@ -208,9 +208,10 @@ const displayBar = function (raw_data) {
 };
 
 const chartHeader = 60;
+const scaleFooter = 10;
 const setupMap = function (width, height) {
     const scaleLength = 400;
-    mapHeight = height;
+    mapHeight = height + scaleFooter;
     projection = d3.geoAlbersUsa()
         .translate([width / 2, height / 2 + chartHeader])
         .scale([1000]);
@@ -297,15 +298,17 @@ const setupMap = function (width, height) {
     svg.append('text')
         .attr("id", "maxScaleLabel")
         .attr("class", "scaleLabel")
-        .attr("y", mapHeight + chartHeader)
+        .attr("y", mapHeight - scaleFooter + chartHeader)
         .attr("x", scaleLength + 50)
+        .style('fill', '#0367A5')
         .text("");
 
     svg.append('text')
         .attr("id", "minScaleLabel")
         .attr("class", "scaleLabel")
-        .attr("y", mapHeight + chartHeader)
+        .attr("y", mapHeight - scaleFooter + chartHeader)
         .attr("x", 0)
+        .style('fill', '#0367A5')
         .text("0ms");
 
 
