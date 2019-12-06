@@ -5,11 +5,27 @@ const numTopStates = 5;
 module.exports = function (io) {
 	let userCount = 0;
 
+	let fullDataSendPending = false;
+	let topCitiesStatesSendPending = false;
+	const fullDataMaxFrequency = 1000; // 1 second
+	const topCitiesStatesMaxFrequency = 3000; // 3 seconds
 	const update = function() {
-		// io.emit('sendData', falseData);
-		db.getData().then((data) => io.emit('sendData', data));
-		db.getTopCities(numTopCities).then((data) => io.emit('sendTopCities', data));
-		db.getTopStates(numTopStates).then((data) => io.emit('sendTopStates', data));
+		if (!fullDataSendPending) {
+			fullDataSendPending = true;
+			setTimeout(() => {
+				db.getData().then((data) => io.emit('sendData', data));
+				fullDataSendPending = false;
+			}, fullDataMaxFrequency);
+		}
+
+		if (!topCitiesStatesSendPending) {
+			topCitiesStatesSendPending = true;
+			setTimeout(() => {
+				db.getTopCities(numTopCities).then((data) => io.emit('sendTopCities', data));
+				db.getTopStates(numTopStates).then((data) => io.emit('sendTopStates', data));
+				topCitiesStatesSendPending = false;
+			}, topCitiesStatesMaxFrequency);
+		}
 	};
 
 	const db = require('./database')(update);
