@@ -8,7 +8,7 @@ const d3 = Object.assign(d3Base, {group});
 let svg = null;
 let projection = null;
 let data = [];
-let displayMobile = true;
+let displayMobile = false;
 let mapHeight;
 
 // data = [{favicon: '', avg: 0.0}]
@@ -236,7 +236,7 @@ const setupMap = function (width, height) {
         .attr("fill", "#0367A6")
         .attr("y", 30)
         .attr("x", width / 2)
-        .text("Use the buttons below to select between data from devices on or off mobile networks");
+        .text("Use the buttons below to select between data from devices on mobile or non-mobile networks");
 
     svg.append('text')
         .attr("id", "selected_favicon_display")
