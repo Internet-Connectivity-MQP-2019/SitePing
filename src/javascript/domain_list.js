@@ -1,7 +1,7 @@
 // Domains to ping
 // Source: https://www.alexa.com/topsites/countries/US
 const domains = [
-	{name: "Google", domain: "https://www.google.com/images/searchbox/desktop_searchbox_sprites302_hr.webp", rank: 1},
+	{name: "Google-2", domain: "https://www.google.com/images/searchbox/desktop_searchbox_sprites302_hr.png", rank: 1},
 	{name: "Youtube", domain: "https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png", rank: 2},
 	{name: "Amazon", domain: "https://www.amazon.com/empty.gif", rank: 3},
 	{name: "Yahoo", domain: "https://s.yimg.com/os/mit/ape/m/81f43c2/t.gif", rank: 4},

@@ -80,7 +80,7 @@ const runCycle = async function () {
 		for (let c = 0; c < backToBackCount; c += 1) {
 			await ping(domain.domain)
 				.then(pingTime => {
-					localData[`${domain.name} (${domain.rank})`].push(pingTime);
+					localData[`${domain.name.split("-")[0]} (${domain.rank})`].push(pingTime);
 
 					while (localData[`${domain.name} (${domain.rank})`].length > rollingNumber) {
 						localData[`${domain.name} (${domain.rank})`].shift();
@@ -198,7 +198,7 @@ document.body.onload = () => {
 	socket.on('sendTopStates', data_display.updateTopStatesByIP);
 
 	const zero_bar = {};
-	domains.forEach(d => zero_bar[`${d.name} (${d.rank})`] = {avg: NaN, max: NaN});
+	domains.forEach(d => zero_bar[`${d.name.split("-")[0]} (${d.rank})`] = {avg: NaN, max: NaN});
 
 	data_display.initializeBar();
 	data_display.displayBar(zero_bar);
