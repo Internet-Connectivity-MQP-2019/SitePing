@@ -22,6 +22,11 @@ let y = null;
 let x = null;
 let bar_svg = null;
 
+const prettifyCity = city => {
+    return city.replace(/\b\w/g, function(l){ return l.toUpperCase() })   // Replace first letters of all words with uppercase letters. \b finds the boundary characters (first letters) of all words found by \w
+               .replace(/\B\w/g, function(l){ return l.toLowerCase() });
+};
+
 const initializeBar = function () {
     bar_initialized = true;
     //Set up scales
@@ -267,6 +272,7 @@ const setupMap = function (width, height) {
         socket.emit('getData');
         socket.emit('getData');
         socket.emit('getTopCities');
+        socket.emit('getTopStates');
 
     });
 
@@ -309,11 +315,33 @@ const setupMap = function (width, height) {
 const setMobile = function(m) {
     displayMobile = m;
     updateMap();
+    updateMap();
     document.querySelector("#selected_favicon_display").innerHTML = displayMobile ? "Mobile Data" : "Non-Mobile Data";
+};
+
+const updateRTTLeaderBoards = () => {
+    const mobile = data.filter(d => d.isMobile === true).sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
+    const non_mobile = data.filter(d => d.isMobile === false).sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
+
+    const mobileLeaderboard = document.querySelector("#cityMobileRTTLeaderboard");
+    mobileLeaderboard.innerHTML = "";
+    mobile.forEach(item => {
+        const city = prettifyCity(item["city"])
+        mobileLeaderboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${Math.round(item["avg_rtt"])} ms)</li>`
+    });
+
+    const nonMobileLeaderboard = document.querySelector("#cityNonMobileRTTLeaderboard");
+    nonMobileLeaderboard.innerHTML = "";
+    non_mobile.forEach(item => {
+        const city = prettifyCity(item["city"])
+        nonMobileLeaderboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${Math.round(item["avg_rtt"])} ms)</li>`
+    });
 };
 
 // data = [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
 const updateMap = function () {
+
+    updateRTTLeaderBoards();
 
     let div = d3.select("body")
         .append("div")
@@ -321,15 +349,11 @@ const updateMap = function () {
         .style("opacity", 0);
 
     const filtered = data.filter(d => d.isMobile === displayMobile);
+
     const maxValue = d3.max(filtered, d => d.avg_rtt);
     let scaledGradient = d3.scaleSequential(d3.interpolateOrRd)
     //.range(["#fff", "#BF303C"])
         .domain([0, maxValue]);
-
-
-    // let constGradient = d3.scaleSequential(d3.interpolatitudeeOrRd)
-    // //.range(["#fff", "#BF303C"])
-    // 	.domain([0, scaleLength]);
 
 
     const mapPoint = svg.selectAll("circle").data(filtered);
@@ -342,10 +366,7 @@ const updateMap = function () {
                 .duration(200)
                 .style("opacity", .9);
             const city = (d.city === undefined || d.city === null || d.city === "") ?
-				"<span style='font-style:italic'>No City</span>" :
-				d.city
-					.replace(/\b\w/g, function(l){ return l.toUpperCase() })   // Replace first letters of all words with uppercase letters. \b finds the boundary characters (first letters) of all words found by \w
-					.replace(/\B\w/g, function(l){ return l.toLowerCase() });  // Replace non-first letters of all words with lowercase letters. \B finds the non-boundary characters of all words found by \w
+				"<span style='font-style:italic'>No City</span>" : prettifyCity(d.city);
             div.html(city + "<br>" + Math.round(d.avg_rtt) + " ms")
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px")
@@ -380,19 +401,77 @@ const updateMap = function () {
 const updateMapData = function (newData) {
     data = newData;
     updateMap();
+    updateMap();
 };
 
 // Given a list of rankings, put them into the ordered list under the map
-const updateTopCities = function (rankings) {
-    const leaderboard = document.querySelector("#cityLeaderboard");
+const updateTopCitiesByIP = function (rankings) {
+    const leaderboard = document.querySelector("#cityIPLeaderboard");
     leaderboard.innerHTML = "";
     rankings.forEach(item => {
-        const city = item["_id"]["city"]
-            .replace(/\b\w/g, function(l){ return l.toUpperCase() })   // Replace first letters of all words with uppercase letters. \b finds the boundary characters (first letters) of all words found by \w
-            .replace(/\B\w/g, function(l){ return l.toLowerCase() });
-
+        const city = prettifyCity(item["_id"]["city"])
         leaderboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${item["count"]})</li>`
     });
 };
 
-export default {displayBar, updateMap, initializeBar, updateMapData, setupMap, updateTopCities}
+const stateLookup = { AZ: 'Arizona',
+    AL: 'Alabama',
+    AK: 'Alaska',
+    AR: 'Arkansas',
+    CA: 'California',
+    CO: 'Colorado',
+    CT: 'Connecticut',
+    DC: 'District of Columbia',
+    DE: 'Delaware',
+    FL: 'Florida',
+    GA: 'Georgia',
+    HI: 'Hawaii',
+    ID: 'Idaho',
+    IL: 'Illinois',
+    IN: 'Indiana',
+    IA: 'Iowa',
+    KS: 'Kansas',
+    KY: 'Kentucky',
+    LA: 'Louisiana',
+    ME: 'Maine',
+    MD: 'Maryland',
+    MA: 'Massachusetts',
+    MI: 'Michigan',
+    MN: 'Minnesota',
+    MS: 'Mississippi',
+    MO: 'Missouri',
+    MT: 'Montana',
+    NE: 'Nebraska',
+    NV: 'Nevada',
+    NH: 'New Hampshire',
+    NJ: 'New Jersey',
+    NM: 'New Mexico',
+    NY: 'New York',
+    NC: 'North Carolina',
+    ND: 'North Dakota',
+    OH: 'Ohio',
+    OK: 'Oklahoma',
+    OR: 'Oregon',
+    PA: 'Pennsylvania',
+    RI: 'Rhode Island',
+    SC: 'South Carolina',
+    SD: 'South Dakota',
+    TN: 'Tennessee',
+    TX: 'Texas',
+    UT: 'Utah',
+    VT: 'Vermont',
+    VA: 'Virginia',
+    WA: 'Washington',
+    WV: 'West Virginia',
+    WI: 'Wisconsin',
+    WY: 'Wyoming' };
+
+const updateTopStatesByIP = function (rankings) {
+    const leaderboard = document.querySelector("#stateIPLeaderboard");
+    leaderboard.innerHTML = "";
+    rankings.forEach(item => {
+        leaderboard.innerHTML += `<li>${stateLookup[item["_id"]["state"]]} (${item["count"]})</li>`
+    });
+};
+
+export default {displayBar, updateMap, initializeBar, updateMapData, setupMap, updateTopCitiesByIP, updateTopStatesByIP}

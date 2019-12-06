@@ -116,7 +116,7 @@ module.exports = function () {
 					}
 				}, {
 					$group: {
-						"_id": {"city": "$city", "state": "$state", "isMobile": "$isMobile"},
+						"_id": {"city": {$toLower: "$city"}, "state": "$state", "isMobile": "$isMobile"},
 						count: {$sum: 1},
 						latitude: {$avg: "$latitude"},
 						longitude: {$avg: "$longitude"},
@@ -149,7 +149,7 @@ module.exports = function () {
 					{
 						$group:
 							{
-								_id: {state: "$state", city: "$city", ip: "$ip"},
+								_id: {state: "$state", city: {$toLower: "$city"}, ip: "$ip"},
 								total: {$sum: 1}
 							}
 					},
@@ -157,6 +157,38 @@ module.exports = function () {
 						$group:
 							{
 								_id: {state: "$_id.state", city: "$_id.city"},
+								count: {$sum: 1}
+							}
+					},
+					{$sort: {count: -1}},
+					{$limit: numTop}
+				]).toArray((err, res) => {
+					resolve(res);
+				})
+			));
+		},
+		getTopStates: function (numTop) {
+			return new Promise(resolve => PingsCollection().then(col =>
+				col.aggregate([
+					{
+						$match: {
+							country: "US",
+							latitude: {$exists: true, $ne: null},
+							longitude: {$exists: true, $ne: null},
+							state: {$exists: true, $nin: [null, '']}
+						}
+					},
+					{
+						$group:
+							{
+								_id: {state: "$state", ip: "$ip"},
+								total: {$sum: 1}
+							}
+					},
+					{
+						$group:
+							{
+								_id: {state: "$_id.state"},
 								count: {$sum: 1}
 							}
 					},

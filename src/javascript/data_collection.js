@@ -194,7 +194,8 @@ document.body.onload = () => {
 	}
 
 	socket.on('sendData', data_display.updateMapData);
-	socket.on('sendTopCities', data_display.updateTopCities);
+	socket.on('sendTopCities', data_display.updateTopCitiesByIP);
+	socket.on('sendTopStates', data_display.updateTopStatesByIP);
 
 	const zero_bar = {};
 	domains.forEach(d => zero_bar[`${d.name} (${d.rank})`] = {avg: NaN, max: NaN});

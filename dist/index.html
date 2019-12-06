@@ -110,9 +110,32 @@
 					<button class="btn btn-dark" id="view_mobile" type="button">View Mobile</button>
 				</div>
 				<br>
-				<h2 style="font-size: 18px; font-weight: bold;">Top 10 Cities (by # of participating IPs)</h2>
+				<div class="row">
+					<div class="col-sm-12 col-lg-6">
+						<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average non-mobile RTT)</h2>
+						<br>
+						<ol id="cityNonMobileRTTLeaderboard"></ol>
+					</div>
+					<div class="col-sm-12 col-lg-6">
+						<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average mobile RTT)</h2>
+						<br>
+						<ol id="cityMobileRTTLeaderboard"></ol>
+					</div>
+				</div>
 				<br>
-				<ol id="cityLeaderboard"></ol>
+				<div class="row">
+					<div class="col-sm-12 col-lg-6">
+						<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by # of participating IPs)</h2>
+						<br>
+						<ol id="cityIPLeaderboard"></ol>
+					</div>
+					<div class="col-sm-12 col-lg-6">
+						<h2 style="font-size: 18px; font-weight: bold;">Top 5 States (by # of participating IPs)</h2>
+						<br>
+						<ol id="stateIPLeaderboard"></ol>
+					</div>
+				</div>
+				<br>
 			</div>
 		</div>
 		<div class="row align-items-center h-100">
