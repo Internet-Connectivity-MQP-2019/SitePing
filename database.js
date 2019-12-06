@@ -130,7 +130,6 @@ module.exports = function () {
 							d.latitude = parseFloat(d.latitude);
 							d.longitude = parseFloat(d.longitude);
 						});
-						console.log(res);
 						resolve(res);
 					})
 			));
