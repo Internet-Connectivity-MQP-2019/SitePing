@@ -107,32 +107,31 @@ module.exports = function () {
 		// returns [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
 		getData: function () {
 			return new Promise(resolve => PingsCollection().then(col =>
-				col.aggregate([
-					{
-						$match: {
-							country: "US",
-							latitude: {"$exists": true, "$ne": null},
-							longitude: {"$exists": true, "$ne": null}
-						}
-					}, {
-						$group: {
-							"_id": {"favicon": "$favicon", "city": "$city", "state": "$state"},
-							count: {$sum: 1},
-							latitude: {$avg: "$latitude"},
-							longitude: {$avg: "$longitude"},
-							avg_rtt: {$avg: "$rtt"},
-							max_rtt: {$max: "$rtt"}
-						}
-					}]).toArray((err, res) => {
-					res.forEach(d => {
-						d.favicon = d._id.favicon;
-						d.city = d._id.city;
-						d.latitude = parseFloat(d.latitude);
-						d.longitude = parseFloat(d.longitude);
-					});
-
-					resolve(res);
-				})
+				col.aggregate([{
+					$match: {
+						country: "US",
+						latitude: {$exists: true, $ne: null},
+						longitude: {$exists: true, $ne: null},
+						state: {$exists: true, $ne: null}
+					}
+				}, {
+					$group: {
+						"_id": {"city": "$city", "state": "$state", "isMobile": "$isMobile"},
+						count: {$sum: 1},
+						latitude: {$avg: "$latitude"},
+						longitude: {$avg: "$longitude"},
+						avg_rtt: {$avg: "$rtt"},
+					}
+				}])
+					.toArray((err, res) => {
+						res.forEach(d => {
+							d.city = d._id.city;
+							d.isMobile = d._id.isMobile;
+							d.latitude = parseFloat(d.latitude);
+							d.longitude = parseFloat(d.longitude);
+						});
+						resolve(res);
+					})
 			));
 		},
 		getTopCities: function (numTop) {
@@ -149,8 +148,10 @@ module.exports = function () {
 					},
 					{
 						$group:
-							{_id: {state: "$state", city: "$city", ip: "$ip"},
-							total: {$sum: 1}}
+							{
+								_id: {state: "$state", city: "$city", ip: "$ip"},
+								total: {$sum: 1}
+							}
 					},
 					{
 						$group:
