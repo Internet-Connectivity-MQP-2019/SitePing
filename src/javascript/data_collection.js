@@ -80,10 +80,11 @@ const runCycle = async function () {
 		for (let c = 0; c < backToBackCount; c += 1) {
 			await ping(domain.domain)
 				.then(pingTime => {
-					localData[`${domain.name.split("-")[0]} (${domain.rank})`].push(pingTime);
+					const displayName = domain.name.split("-")[0];
+					localData[`${displayName} (${domain.rank})`].push(pingTime);
 
-					while (localData[`${domain.name} (${domain.rank})`].length > rollingNumber) {
-						localData[`${domain.name} (${domain.rank})`].shift();
+					while (localData[`${displayName} (${domain.rank})`].length > rollingNumber) {
+						localData[`${displayName} (${domain.rank})`].shift();
 					}
 
 					newData.push({favicon: domain.name, rtt: pingTime, backToBackId: c});
@@ -190,7 +191,8 @@ document.body.onload = () => {
 
 	for (let i = 0; i < domains.length; i++) {
 		const d = domains[i];
-		localData[`${d.name} (${d.rank})`] = [];
+		const displayName = d.name.split("-")[0];
+		localData[`${displayName} (${d.rank})`] = [];
 	}
 
 	socket.on('sendData', data_display.updateMapData);
