@@ -1,4 +1,5 @@
 const mobile_detect = require('mobile-detect');
+const jwt = require('jsonwebtoken');
 
 const numTopCities = 5;
 const numTopStates = 5;
@@ -67,5 +68,12 @@ module.exports = function (io) {
 
 		socket.on('getTopCities', () => db.getTopCities(numTopCities).then(data => socket.emit('sendTopCities', data)));
 		socket.on('getTopStates', () => db.getTopStates(numTopStates).then(data => socket.emit('sendTopStates', data)));
+
+		socket.on('getTurkToken', (data) => {
+			const token = jwt.sign({
+				count: data.count
+			}, process.env.JWT_SECRET, { expiresIn: '7d'});
+			socket.emit('sendTurkToken', token);
+		});
 	});
 };

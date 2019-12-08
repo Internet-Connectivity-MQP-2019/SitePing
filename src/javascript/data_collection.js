@@ -12,6 +12,11 @@ const backToBackCount = 2;
 const userLocation = {latitude: undefined, longitude: undefined};
 let locationRequestInProgress = false;
 
+let mturk = false;
+let mturkCounter = 0;
+const mturkMinimum = 10;
+let mturkTokenProvided = false;
+
 /**
  * Shuffles array in place.
  * @param {Array} a items An array containing the items.
@@ -145,6 +150,14 @@ const startCollection = async function () {
 			let newData = await runCycle();
 
 			socket.emit('submitNewData', newData);
+
+			if (mturk) {
+				mturkCounter += newData.length;
+				if (mturkCounter > mturkMinimum && !mturkTokenProvided) {
+					socket.emit('getTurkToken', {count: mturkCounter});
+				}
+			}
+
 			data_display.displayBar(aggregateLocalData());
 		}
 	}
@@ -158,6 +171,22 @@ const geoLocate = function() {
 			userLocation.longitude = position.coords.longitude.toFixed(2);
 			locationRequestInProgress = false;
 		});
+	}
+};
+
+const selectText = (element) => {
+	const text = document.querySelector(element);
+
+	if (document.body.createTextRange) { // ms
+		const range = document.body.createTextRange();
+		range.moveToElementText(text);
+		range.select();
+	} else if (window.getSelection) { // moz, opera, webkit
+		const selection = window.getSelection();
+		const range = document.createRange();
+		range.selectNodeContents(text);
+		selection.removeAllRanges();
+		selection.addRange(range);
 	}
 };
 
@@ -175,6 +204,11 @@ document.body.onload = () => {
 			startCollection().then();
 		}
 	};
+
+	if (window.location.search.indexOf("mturk") > -1) {
+		mturk = true;
+		document.querySelector('#mturk-div').style.display = "block";
+	}
 
 	const startCollectionButton = document.querySelector("#start_collection_button");
 	const stopCollectionButton = document.querySelector("#stop_collection_button");
@@ -198,6 +232,13 @@ document.body.onload = () => {
 	socket.on('sendData', data_display.updateMapData);
 	socket.on('sendTopCities', data_display.updateTopCitiesByIP);
 	socket.on('sendTopStates', data_display.updateTopStatesByIP);
+
+	socket.on('sendTurkToken', data => {
+		document.querySelector("#mturk-token").innerHTML = data;
+		document.querySelector("#mturk-token").style.display = "block";
+		selectText("#mturk-token");
+		mturkTokenProvided = true;
+	});
 
 	const zero_bar = {};
 	domains.forEach(d => zero_bar[`${d.name.split("-")[0]} (${d.rank})`] = {avg: NaN, max: NaN});
