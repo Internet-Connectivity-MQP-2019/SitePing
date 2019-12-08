@@ -14,7 +14,7 @@ let locationRequestInProgress = false;
 
 let mturk = false;
 let mturkCounter = 0;
-const mturkMinimum = 10;
+const mturkMinimum = 150;
 let mturkTokenProvided = false;
 
 /**
