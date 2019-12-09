@@ -3,6 +3,7 @@ import {group} from 'd3-array';
 import * as topojson from 'topojson';
 import domains from './domain_list'
 import socket from './index';
+import {quantile} from "d3";
 
 const d3 = Object.assign(d3Base, {group});
 let svg = null;
@@ -283,7 +284,7 @@ const setupMap = function (width, height) {
         .append("rect")
         .attr("class", "bars")
         .attr("x", function (d, i) {
-            return i + 40;
+            return i + 60;
         })
         .attr("y", mapHeight - 20 + chartHeader)
         .attr("height", 20)
@@ -296,7 +297,7 @@ const setupMap = function (width, height) {
         .attr("id", "maxScaleLabel")
         .attr("class", "scaleLabel")
         .attr("y", mapHeight - scaleFooter + chartHeader)
-        .attr("x", scaleLength + 50)
+        .attr("x", scaleLength + 70)
         .style('fill', '#0367A5')
         .text("");
 
@@ -351,9 +352,27 @@ const updateMap = function () {
     const filtered = data.filter(d => d.isMobile === displayMobile);
 
     const maxValue = d3.max(filtered, d => d.avg_rtt);
+    const minValue = d3.min(filtered, d => d.avg_rtt);
+
+    const values = [];
+    for (let i = 0; i < filtered.length; i++) {
+        values.push(filtered[i].avg_rtt);
+    }
+
+    const q1 = d3.quantile(values, 0.25);
+    const q2 = d3.quantile(values, 0.50);
+    const q3 = d3.quantile(values, 0.75);
+
+    const iqr = q1 - q3;
+
+    const quantileFiltered = filtered.filter(d => d.avg_rtt <= (q2 + iqr)  && d.avg_rtt >= (q2 - iqr));
+
+    const scaleMin = Math.max(Math.round(d3.min(quantileFiltered, d => d.avg_rtt)), 0, minValue);
+    const scaleMax = Math.min(Math.round(d3.max(quantileFiltered, d => d.avg_rtt)), maxValue);
+
     let scaledGradient = d3.scaleSequential(d3.interpolateOrRd)
     //.range(["#fff", "#BF303C"])
-        .domain([0, maxValue]);
+        .domain([scaleMin, scaleMax]);
 
 
     const mapPoint = svg.selectAll("circle").data(filtered);
@@ -391,8 +410,8 @@ const updateMap = function () {
         });
 
     if (maxValue !== undefined) {
-        document.querySelector("#minScaleLabel").textContent = "0ms";
-        document.querySelector("#maxScaleLabel").textContent = Math.round(maxValue) + "ms";
+        document.querySelector("#minScaleLabel").textContent = `≤${scaleMin}ms`;
+        document.querySelector("#maxScaleLabel").textContent = "≥" + Math.round(scaleMax) + "ms";
     }
 
 
