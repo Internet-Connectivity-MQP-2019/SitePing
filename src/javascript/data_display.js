@@ -354,18 +354,21 @@ const updateMap = function () {
     const maxValue = d3.max(filtered, d => d.avg_rtt);
     const minValue = d3.min(filtered, d => d.avg_rtt);
 
-    const values = [];
+    let values = [];
     for (let i = 0; i < filtered.length; i++) {
         values.push(filtered[i].avg_rtt);
     }
 
+    values = values.sort((a, b) => a - b);
+
     const q1 = d3.quantile(values, 0.25);
     const q2 = d3.quantile(values, 0.50);
     const q3 = d3.quantile(values, 0.75);
+    console.log(q1, q2, q3);
+    const iqr = q3 - q1;
+    console.log("IQR", iqr);
 
-    const iqr = q1 - q3;
-
-    const quantileFiltered = filtered.filter(d => d.avg_rtt <= (q2 + iqr)  && d.avg_rtt >= (q2 - iqr));
+    const quantileFiltered = filtered.filter(d => d.avg_rtt <= (q2 + (iqr * 1.5))  && d.avg_rtt >= (q2 - (iqr * 1.5)));
 
     const scaleMin = Math.max(Math.round(d3.min(quantileFiltered, d => d.avg_rtt)), 0, minValue);
     const scaleMax = Math.min(Math.round(d3.max(quantileFiltered, d => d.avg_rtt)), maxValue);
