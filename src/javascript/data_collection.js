@@ -36,6 +36,10 @@ const localData = {};
 const runCycle = async function () {
 	const newData = [];
 
+	if (ga !== undefined) {
+		ga('send', 'event', 'cycle', 'start');
+	}
+
 	/**
 	 * Creates and loads an image element by url.
 	 * @param  {String} url
@@ -112,6 +116,10 @@ const runCycle = async function () {
 			};
 		}
 	});
+
+	if (ga !== undefined) {
+		ga('send', 'event', 'cycle', 'complete');
+	}
 
 	return newData;
 };
