@@ -321,8 +321,8 @@ const setMobile = function(m) {
 };
 
 const updateRTTLeaderBoards = () => {
-    const mobile = data.filter(d => d.isMobile === true).sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
-    const non_mobile = data.filter(d => d.isMobile === false).sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
+    const mobile = data.filter(d => d.isMobile === true && d.city !== "").sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
+    const non_mobile = data.filter(d => d.isMobile === false && d.city !== "").sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
 
     const mobileLeaderboard = document.querySelector("#cityMobileRTTLeaderboard");
     mobileLeaderboard.innerHTML = "";
