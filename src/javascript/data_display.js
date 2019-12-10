@@ -364,14 +364,12 @@ const updateMap = function () {
     const q1 = d3.quantile(values, 0.25);
     const q2 = d3.quantile(values, 0.50);
     const q3 = d3.quantile(values, 0.75);
-    console.log(q1, q2, q3);
     const iqr = q3 - q1;
-    console.log("IQR", iqr);
 
     const quantileFiltered = filtered.filter(d => d.avg_rtt <= (q2 + (iqr * 1.5))  && d.avg_rtt >= (q2 - (iqr * 1.5)));
 
-    const scaleMin = Math.max(Math.round(d3.min(quantileFiltered, d => d.avg_rtt)), 0, minValue);
-    const scaleMax = Math.min(Math.round(d3.max(quantileFiltered, d => d.avg_rtt)), maxValue);
+    const scaleMin = Math.max(Math.round(d3.min(quantileFiltered, d => d.avg_rtt)), 0, Math.round(minValue));
+    const scaleMax = Math.min(Math.round(d3.max(quantileFiltered, d => d.avg_rtt)), Math.round(maxValue));
 
     let scaledGradient = d3.scaleSequential(d3.interpolateOrRd)
     //.range(["#fff", "#BF303C"])
