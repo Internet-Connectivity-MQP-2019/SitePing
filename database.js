@@ -142,7 +142,7 @@ module.exports = function () {
 							country: "US",
 							latitude: {$exists: true, $ne: null},
 							longitude: {$exists: true, $ne: null},
-							city: {$exists: true, $ne: null},
+							city: {$exists: true, $nin: [null, ""]},
 							state: {$exists: true, $ne: null}
 						}
 					},
