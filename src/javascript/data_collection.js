@@ -16,6 +16,7 @@ let mturk = false;
 let mturkCounter = 0;
 const mturkMinimum = 150;
 let mturkTokenProvided = false;
+let mturkAnnotation = null;
 
 /**
  * Shuffles array in place.
@@ -162,7 +163,7 @@ const startCollection = async function () {
 			if (mturk) {
 				mturkCounter += newData.length;
 				if (mturkCounter > mturkMinimum && !mturkTokenProvided) {
-					socket.emit('getTurkToken', {count: mturkCounter});
+					socket.emit('getTurkToken', {count: mturkCounter, hit_annotation: mturkAnnotation});
 				}
 			}
 
@@ -213,8 +214,10 @@ document.body.onload = () => {
 		}
 	};
 
-	if (window.location.search.indexOf("mturk") > -1) {
+	const mturkIndex = window.location.search.indexOf("mturk=");
+	if (mturkIndex > -1) {
 		mturk = true;
+		mturkAnnotation = window.location.search.substring(mturkIndex + 6).split('&')[0];
 		document.querySelector('#mturk-div').style.display = "block";
 	}
 

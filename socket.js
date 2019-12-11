@@ -71,7 +71,8 @@ module.exports = function (io) {
 
 		socket.on('getTurkToken', (data) => {
 			const token = jwt.sign({
-				count: data.count
+				count: data.count,
+				hit_annotation: data.hit_annotation
 			}, process.env.JWT_SECRET, { expiresIn: '7d'});
 			socket.emit('sendTurkToken', token);
 		});
