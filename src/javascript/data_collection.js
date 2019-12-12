@@ -85,6 +85,8 @@ const runCycle = async function () {
 	for (let i = 0; i < local_domains.length; i += 1) {
 		if (stopped) break;
 
+		document.querySelector("#progressBar").value = i;
+
 		const domain = local_domains[i];
 
 		for (let c = 0; c < backToBackCount; c += 1) {
@@ -100,6 +102,8 @@ const runCycle = async function () {
 					newData.push({favicon: domain.name, rtt: pingTime, backToBackId: c});
 				})
 				.catch(console.log);
+
+			document.querySelector("#progressBar").value += 1.0/backToBackCount;
 		}
 	}
 
@@ -144,6 +148,7 @@ const stopCollection = function () {
 	console.log("Collection stop");
 	document.querySelector("#start_collection_button_modal").disabled = false;
 	document.querySelector("#stop_collection_button").disabled = true;
+	document.querySelector("#progressBar").value = 0;
 };
 
 const startCollection = async function () {
