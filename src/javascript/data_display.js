@@ -321,21 +321,36 @@ const setMobile = function(m) {
 };
 
 const updateRTTLeaderBoards = () => {
-    const mobile = data.filter(d => d.isMobile === true && d.city !== "").sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
-    const non_mobile = data.filter(d => d.isMobile === false && d.city !== "").sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
+    const top_mobile = data.filter(d => d.isMobile === true && d.city !== "").sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
+    const top_non_mobile = data.filter(d => d.isMobile === false && d.city !== "").sort((a, b) => a.avg_rtt - b.avg_rtt).splice(0, 5);
+    const worst_mobile = data.filter(d => d.isMobile === true && d.city !== "").sort((a, b) => b.avg_rtt - a.avg_rtt).splice(0, 5);
+    const worst_non_mobile = data.filter(d => d.isMobile === false && d.city !== "").sort((a, b) => b.avg_rtt - a.avg_rtt).splice(0, 5);
 
     const mobileLeaderboard = document.querySelector("#cityMobileRTTLeaderboard");
     mobileLeaderboard.innerHTML = "";
-    mobile.forEach(item => {
+    top_mobile.forEach(item => {
         const city = prettifyCity(item["city"])
         mobileLeaderboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${Math.round(item["avg_rtt"])} ms)</li>`
     });
 
     const nonMobileLeaderboard = document.querySelector("#cityNonMobileRTTLeaderboard");
     nonMobileLeaderboard.innerHTML = "";
-    non_mobile.forEach(item => {
+    top_non_mobile.forEach(item => {
         const city = prettifyCity(item["city"])
         nonMobileLeaderboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${Math.round(item["avg_rtt"])} ms)</li>`
+    });
+    const mobileLoserboard = document.querySelector("#cityMobileRTTLoserboard");
+    mobileLoserboard.innerHTML = "";
+    worst_mobile.forEach(item => {
+        const city = prettifyCity(item["city"])
+        mobileLoserboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${Math.round(item["avg_rtt"])} ms)</li>`
+    });
+
+    const nonMobileLoserboard = document.querySelector("#cityNonMobileRTTLoserboard");
+    nonMobileLoserboard.innerHTML = "";
+    worst_non_mobile.forEach(item => {
+        const city = prettifyCity(item["city"])
+        nonMobileLoserboard.innerHTML += `<li>${city}, ${item["_id"]["state"]} (${Math.round(item["avg_rtt"])} ms)</li>`
     });
 };
 
