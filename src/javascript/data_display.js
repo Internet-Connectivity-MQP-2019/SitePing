@@ -6,10 +6,13 @@ import socket from './index';
 import {quantile} from "d3";
 
 const d3 = Object.assign(d3Base, {group});
-let svg = null;
+let mapSvg = null;
+let mapHeaderSvg = null;
+let mapFooterSvg = null;
 let projection = null;
 let data = [];
 let displayMobile = false;
+let stateView = false;
 let mapHeight;
 
 // data = [{favicon: '', avg: 0.0}]
@@ -203,28 +206,39 @@ const displayBar = function (raw_data) {
         });
 };
 
-const chartHeader = 60;
-const scaleFooter = 10;
+const chartHeader = 80;
+const scaleFooter = 20;
 const setupMap = function (width, height) {
     const scaleLength = 400;
-    mapHeight = height + scaleFooter;
+    mapHeight = height;
     projection = d3.geoAlbersUsa()
-        .translate([width / 2, height / 2 + chartHeader])
+        .translate([width / 2, height / 2])
         .scale([1000]);
 
     let path = d3.geoPath()
         .projection(projection);
 
-    svg = d3.select("#map_div")
+    mapSvg = d3.select("#map_div")
         .append("svg")
         .attr("width", width)
-        .attr("height", height + chartHeader);
+        .attr("height", height);
+
+    mapHeaderSvg = d3.select("#map_header_div")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", chartHeader);
+
+    mapFooterSvg = d3.select("#map_footer_div")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", scaleFooter);
+
 
     let constGradient = d3.scaleSequential(d3.interpolateOrRd)
     //.range(["#fff", "#BF303C"])
         .domain([0, scaleLength]);
 
-    svg.append('text')
+    mapHeaderSvg.append('text')
         .attr("class", "chart-header")
         .attr("dominant-baseline", "hanging")
         .attr("text-anchor", "middle")
@@ -235,7 +249,7 @@ const setupMap = function (width, height) {
         .attr("x", width / 2)
         .text("Country-wide Data Aggregated by City");
 
-    svg.append('text')
+    mapHeaderSvg.append('text')
         .attr("class", "chart-header")
         .attr("dominant-baseline", "hanging")
         .attr("text-anchor", "middle")
@@ -245,30 +259,33 @@ const setupMap = function (width, height) {
         .attr("x", width / 2)
         .text("Use the buttons below to select between data from devices on mobile or non-mobile networks");
 
-    svg.append('text')
+    mapHeaderSvg.append('text')
         .attr("id", "selected_favicon_display")
         .attr("dominant-baseline", "hanging")
         .attr("text-anchor", "middle")
-        .attr("y", 25 + chartHeader)
+        .attr("y", 50)
         .attr("x", width / 2)
         .text(displayMobile ? "Mobile Data" : "Non-Mobile Data");
 
 
     d3.json("us-named.topojson").then(us => {
         const counties = topojson.feature(us, us.objects.counties);
-        svg.selectAll("path")
+        mapSvg.selectAll("path")
             .data(counties.features)
             .enter()
             .append("path")
             .attr("d", path)
-            .style("fill", "#0367A6");
+            .style("fill", function(d) {
+                return "#0367A6"
+            });
 
-        svg.append("path")
+
+        mapSvg.append("path")
             .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
             .attr("fill", "none")
             .attr("stroke", "white")
             .attr("stroke-linejoin", "round")
-            .attr("d", path);
+            .attr("d", path)
 
         socket.emit('getData');
         socket.emit('getData');
@@ -277,7 +294,7 @@ const setupMap = function (width, height) {
 
     });
 
-    let bars = svg.selectAll(".bars")
+    let bars = mapFooterSvg.selectAll(".bars")
         .data(d3.range(0, scaleLength), d => d);
     bars.exit().remove();
     bars.enter()
@@ -286,33 +303,41 @@ const setupMap = function (width, height) {
         .attr("x", function (d, i) {
             return i + 60;
         })
-        .attr("y", mapHeight - 20 + chartHeader)
+        .attr("y", scaleFooter/2)
         .attr("height", 20)
         .attr("width", 1)
         .style("fill", function (d) {
             return constGradient(d);
         });
 
-    svg.append('text')
+    mapFooterSvg.append('text')
         .attr("id", "maxScaleLabel")
         .attr("class", "scaleLabel")
-        .attr("y", mapHeight - scaleFooter + chartHeader)
+        .attr("y", scaleFooter/2+10)
         .attr("x", scaleLength + 70)
         .style('fill', '#0367A5')
         .text("");
 
-    svg.append('text')
+    mapFooterSvg.append('text')
         .attr("id", "minScaleLabel")
         .attr("class", "scaleLabel")
-        .attr("y", mapHeight - scaleFooter + chartHeader)
+        .attr("y", scaleFooter/2+10)
         .attr("x", 0)
         .style('fill', '#0367A5')
         .text("0ms");
 
     document.querySelector("#view_mobile").onclick = () => {setMobile(true)};
     document.querySelector("#view_non_mobile").onclick = () => {setMobile(false)};
+
+    document.querySelector("#view_by_state").onclick = () => {setStateView(true)};
+    document.querySelector("#view_by_city").onclick = () => {setStateView(false)};
 };
 
+const setStateView = function(s) {
+    stateView = s;
+    updateMap();
+    updateMap();
+};
 const setMobile = function(m) {
     displayMobile = m;
     updateMap();
@@ -354,9 +379,7 @@ const updateRTTLeaderBoards = () => {
     });
 };
 
-// data = [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
-const updateMap = function () {
-
+const updateMap = function(){
     updateRTTLeaderBoards();
 
     let div = d3.select("body")
@@ -390,8 +413,64 @@ const updateMap = function () {
     //.range(["#fff", "#BF303C"])
         .domain([scaleMin, scaleMax]);
 
+    if(stateView == true){
+        updatesStateMap(div, filtered, scaledGradient)
+    }
+    else {
+        updatesCityMap(div, filtered, scaledGradient)
+    }
 
-    const mapPoint = svg.selectAll("circle").data(filtered);
+    if (maxValue !== undefined) {
+        document.querySelector("#minScaleLabel").textContent = `≤${scaleMin}ms`;
+        document.querySelector("#maxScaleLabel").textContent = "≥" + Math.round(scaleMax) + "ms";
+    }
+
+}
+
+const updatesStateMap = function (div, filteredData, scaledGradient) {
+
+    projection = d3.geoAlbersUsa()
+        .translate([width / 2, height / 2])
+        .scale([1000]);
+
+    let path = d3.geoPath()
+        .projection(projection);
+
+    d3.json("us-named.topojson").then(us => {
+        const counties = topojson.feature(us, us.objects.counties);
+        const states = topojson.feature(us, us.objects.states);
+        mapSvg.selectAll("path")
+            .data(states.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .style("fill", function(d) {
+                console.log(d.properties.name)
+                if(d.properties.name === "Oregon")
+                    return "#0367A6"
+                else{
+                    return "#FFF"
+                }
+            });
+
+
+        mapSvg.append("path")
+            .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+            .attr("fill", "none")
+            .attr("stroke", "white")
+            .attr("stroke-linejoin", "round")
+            .attr("d", path)
+
+    });
+
+
+}
+
+// data = [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
+const updatesCityMap = function (div, filtered, scaledGradient) {
+
+
+    const mapPoint = mapSvg.selectAll("circle").data(filtered);
     mapPoint.exit().remove();
     mapPoint.enter()
         .append("circle")
@@ -424,11 +503,6 @@ const updateMap = function () {
         .style("fill", function (d) {
             return scaledGradient(d.avg_rtt)
         });
-
-    if (maxValue !== undefined) {
-        document.querySelector("#minScaleLabel").textContent = `≤${scaleMin}ms`;
-        document.querySelector("#maxScaleLabel").textContent = "≥" + Math.round(scaleMax) + "ms";
-    }
 
 
 };
