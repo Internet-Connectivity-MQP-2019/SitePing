@@ -10,10 +10,13 @@ let mapSvg = null;
 let mapHeaderSvg = null;
 let mapFooterSvg = null;
 let projection = null;
+let path = null;
 let data = [];
 let displayMobile = false;
 let stateView = false;
 let mapHeight;
+let mapWidth;
+
 
 // data = [{favicon: '', avg: 0.0}]
 let bar_initialized = false;
@@ -211,17 +214,21 @@ const scaleFooter = 20;
 const setupMap = function (width, height) {
     const scaleLength = 400;
     mapHeight = height;
+    mapWidth = width
     projection = d3.geoAlbersUsa()
         .translate([width / 2, height / 2])
         .scale([1000]);
 
-    let path = d3.geoPath()
+    path = d3.geoPath()
         .projection(projection);
+
 
     mapSvg = d3.select("#map_div")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
+
+
 
     mapHeaderSvg = d3.select("#map_header_div")
         .append("svg")
@@ -267,32 +274,12 @@ const setupMap = function (width, height) {
         .attr("x", width / 2)
         .text(displayMobile ? "Mobile Data" : "Non-Mobile Data");
 
+    setupCityMap()
 
-    d3.json("us-named.topojson").then(us => {
-        const counties = topojson.feature(us, us.objects.counties);
-        mapSvg.selectAll("path")
-            .data(counties.features)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .style("fill", function(d) {
-                return "#0367A6"
-            });
-
-
-        mapSvg.append("path")
-            .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
-            .attr("fill", "none")
-            .attr("stroke", "white")
-            .attr("stroke-linejoin", "round")
-            .attr("d", path)
-
-        socket.emit('getData');
-        socket.emit('getData');
-        socket.emit('getTopCities');
-        socket.emit('getTopStates');
-
-    });
+    socket.emit('getData');
+    socket.emit('getData');
+    socket.emit('getTopCities');
+    socket.emit('getTopStates');
 
     let bars = mapFooterSvg.selectAll(".bars")
         .data(d3.range(0, scaleLength), d => d);
@@ -334,14 +321,18 @@ const setupMap = function (width, height) {
 };
 
 const setStateView = function(s) {
+    if(stateView == true){
+
+        setupCityMap()
+    }
     stateView = s;
-    updateMap();
+    //updateMap();
     updateMap();
 };
 const setMobile = function(m) {
     displayMobile = m;
     updateMap();
-    updateMap();
+    //updateMap();
     document.querySelector("#selected_favicon_display").innerHTML = displayMobile ? "Mobile Data" : "Non-Mobile Data";
 };
 
@@ -379,22 +370,14 @@ const updateRTTLeaderBoards = () => {
     });
 };
 
-const updateMap = function(){
-    updateRTTLeaderBoards();
+const makeScaleGradient =  function (data) {
 
-    let div = d3.select("body")
-        .append("div")
-        .attr('class', "tooltip")
-        .style("opacity", 0);
-
-    const filtered = data.filter(d => d.isMobile === displayMobile);
-
-    const maxValue = d3.max(filtered, d => d.avg_rtt);
-    const minValue = d3.min(filtered, d => d.avg_rtt);
+    const maxValue = d3.max(data, d => d.avg_rtt);
+    const minValue = d3.min(data, d => d.avg_rtt);
 
     let values = [];
-    for (let i = 0; i < filtered.length; i++) {
-        values.push(filtered[i].avg_rtt);
+    for (let i = 0; i < data.length; i++) {
+        values.push(data[i].avg_rtt);
     }
 
     values = values.sort((a, b) => a - b);
@@ -404,7 +387,7 @@ const updateMap = function(){
     const q3 = d3.quantile(values, 0.75);
     const iqr = q3 - q1;
 
-    const quantileFiltered = filtered.filter(d => d.avg_rtt <= (q2 + (iqr * 1.5))  && d.avg_rtt >= (q2 - (iqr * 1.5)));
+    const quantileFiltered = data.filter(d => d.avg_rtt <= (q2 + (iqr * 1.5))  && d.avg_rtt >= (q2 - (iqr * 1.5)));
 
     const scaleMin = Math.max(Math.round(d3.min(quantileFiltered, d => d.avg_rtt)), 0, Math.round(minValue));
     const scaleMax = Math.min(Math.round(d3.max(quantileFiltered, d => d.avg_rtt)), Math.round(maxValue));
@@ -413,28 +396,74 @@ const updateMap = function(){
     //.range(["#fff", "#BF303C"])
         .domain([scaleMin, scaleMax]);
 
-    if(stateView == true){
-        updatesStateMap(div, filtered, scaledGradient)
-    }
-    else {
-        updatesCityMap(div, filtered, scaledGradient)
-    }
-
     if (maxValue !== undefined) {
         document.querySelector("#minScaleLabel").textContent = `≤${scaleMin}ms`;
         document.querySelector("#maxScaleLabel").textContent = "≥" + Math.round(scaleMax) + "ms";
     }
 
+    return scaledGradient;
+
 }
 
-const updatesStateMap = function (div, filteredData, scaledGradient) {
+const updateMap = function(){
+    updateRTTLeaderBoards();
 
-    projection = d3.geoAlbersUsa()
-        .translate([width / 2, height / 2])
-        .scale([1000]);
+    let div = d3.select("body")
+        .append("div")
+        .attr('class', "tooltip")
+        .style("opacity", 0);
 
-    let path = d3.geoPath()
-        .projection(projection);
+    const filteredMobile = data.filter(d => d.isMobile === displayMobile);
+
+
+    if(stateView == true){
+
+        let rawDataDict = {}
+        let stateData = []
+        let finalStateDataDict = {}
+        for (let i = 0; i < filteredMobile.length; i++) {
+            if(rawDataDict[filteredMobile[i]._id.state] == undefined){
+                rawDataDict[filteredMobile[i]._id.state] = [];
+            }
+            rawDataDict[filteredMobile[i]._id.state].push(filteredMobile[i].avg_rtt);
+        }
+
+        let min = 1000
+        let max = 0
+        Object.keys(rawDataDict).forEach(stateName => {
+            let sum = 0;
+            let count = 0;
+            let currentData = rawDataDict[stateName]
+
+            for (let i = 0; i < currentData.length; i++){
+                sum = sum + currentData[i];
+                count ++;
+            };
+            const stateAvg = sum/count;
+
+            if(stateAvg < min) min = stateAvg;
+            if(stateAvg > max) max = stateAvg;
+            stateData.push({"avg_rtt": stateAvg, "state_name": stateLookup[stateName]})
+            finalStateDataDict[stateLookup[stateName]]= stateAvg
+        })
+
+        let scaledGradient = makeScaleGradient(stateData)
+
+        updatesStateMap(div, finalStateDataDict, scaledGradient)
+    }
+    else {
+        let scaledGradient = makeScaleGradient(data);
+        updatesCityMap(div, filteredMobile, scaledGradient)
+
+
+    }
+
+}
+
+const updatesStateMap = function (div, stateData, scaledGradient) {
+
+    mapSvg.selectAll("path").remove()
+    mapSvg.selectAll("circle").remove();
 
     d3.json("us-named.topojson").then(us => {
         const counties = topojson.feature(us, us.objects.counties);
@@ -445,12 +474,29 @@ const updatesStateMap = function (div, filteredData, scaledGradient) {
             .append("path")
             .attr("d", path)
             .style("fill", function(d) {
-                console.log(d.properties.name)
-                if(d.properties.name === "Oregon")
-                    return "#0367A6"
-                else{
-                    return "#FFF"
-                }
+                //console.log(d.properties.name)
+                let stateName = d.properties.name
+                if(Object.keys(stateData).includes(stateName))
+                    return scaledGradient(stateData[d.properties.name])
+                return "#0367A6"
+            }).on("mouseover", d => {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            const state = d.properties.name
+            let rttString = "No Data"
+            let stateName = d.properties.name
+            if(Object.keys(stateData).includes(stateName))
+                rttString = Math.round(stateData[d.properties.name]) +" ms"
+            div.html(state + "<br>" + rttString)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("font-size", "15px")
+        })
+            .on("mouseout", () => {
+                div.transition()
+                    .duration(200)
+                    .style("opacity", 0)
             });
 
 
@@ -466,12 +512,36 @@ const updatesStateMap = function (div, filteredData, scaledGradient) {
 
 }
 
+const setupCityMap = function () {
+    mapSvg.selectAll("*").remove();
+    //mapSvg.selectAll("circle").remove();
+
+    d3.json("us-named.topojson").then(us => {
+        const counties = topojson.feature(us, us.objects.counties);
+        mapSvg.selectAll("path")
+            .data(counties.features)
+            .enter()
+            .insert("path")
+            .attr("d", path)
+            .style("fill", function(d) {
+                return "#0367A6"
+            });
+
+
+        mapSvg.insert("path")
+            .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+            .attr("fill", "none")
+            .attr("stroke", "white")
+            .attr("stroke-linejoin", "round")
+            .attr("d", path)
+
+    });
+}
+
 // data = [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
 const updatesCityMap = function (div, filtered, scaledGradient) {
-
-
     const mapPoint = mapSvg.selectAll("circle").data(filtered);
-    mapPoint.exit().remove();
+    //mapPoint.exit().remove();
     mapPoint.enter()
         .append("circle")
         .style("opacity", .7)
@@ -509,7 +579,7 @@ const updatesCityMap = function (div, filtered, scaledGradient) {
 
 const updateMapData = function (newData) {
     data = newData;
-    updateMap();
+    //updateMap();
     updateMap();
 };
 
