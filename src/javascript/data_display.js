@@ -6,7 +6,8 @@ import socket from './index';
 import {quantile} from "d3";
 
 const d3 = Object.assign(d3Base, {group});
-let mapSvg = null;
+let cityMapSvg = null;
+let stateMapSvg = null;
 let mapHeaderSvg = null;
 let mapFooterSvg = null;
 let projection = null;
@@ -209,9 +210,11 @@ const displayBar = function (raw_data) {
         });
 };
 
-const chartHeader = 80;
+const chartHeader = 110;
 const scaleFooter = 20;
 const setupMap = function (width, height) {
+
+
     const scaleLength = 400;
     mapHeight = height;
     mapWidth = width
@@ -222,12 +225,15 @@ const setupMap = function (width, height) {
     path = d3.geoPath()
         .projection(projection);
 
-
-    mapSvg = d3.select("#map_div")
+    cityMapSvg = d3.select("#map_div_by_city")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
 
+    stateMapSvg = d3.select("#map_div_by_state")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
 
     mapHeaderSvg = d3.select("#map_header_div")
@@ -246,6 +252,7 @@ const setupMap = function (width, height) {
         .domain([0, scaleLength]);
 
     mapHeaderSvg.append('text')
+        .attr("id", "map_display_type")
         .attr("class", "chart-header")
         .attr("dominant-baseline", "hanging")
         .attr("text-anchor", "middle")
@@ -254,7 +261,7 @@ const setupMap = function (width, height) {
         .attr("fill", "#0367A6")
         .attr("y", 5)
         .attr("x", width / 2)
-        .text("Country-wide Data Aggregated by City");
+        .text("Country-wide Data Aggregated by " + (stateView ? "State" : "City"));
 
     mapHeaderSvg.append('text')
         .attr("class", "chart-header")
@@ -270,7 +277,7 @@ const setupMap = function (width, height) {
         .attr("id", "selected_favicon_display")
         .attr("dominant-baseline", "hanging")
         .attr("text-anchor", "middle")
-        .attr("y", 50)
+        .attr("y", chartHeader - 50)
         .attr("x", width / 2)
         .text(displayMobile ? "Mobile Data" : "Non-Mobile Data");
 
@@ -318,22 +325,39 @@ const setupMap = function (width, height) {
 
     document.querySelector("#view_by_state").onclick = () => {setStateView(true)};
     document.querySelector("#view_by_city").onclick = () => {setStateView(false)};
+
+    if(stateView === true){
+        document.getElementById("map_div_by_state").hidden = false;
+        document.getElementById("map_div_by_city").hidden = true;
+    }
+    else {
+        document.getElementById("map_div_by_state").hidden = true;
+        document.getElementById("map_div_by_city").hidden = false;
+    }
+
 };
 
 const setStateView = function(s) {
-    if(stateView == true){
-
-        setupCityMap()
-    }
     stateView = s;
+    if(stateView === true){
+        document.getElementById("map_div_by_state").hidden = false;
+        document.getElementById("map_div_by_city").hidden = true;
+    }
+    else {
+        document.getElementById("map_div_by_state").hidden = true;
+        document.getElementById("map_div_by_city").hidden = false;
+    }
     //updateMap();
+    document.querySelector("#map_display_type").innerHTML =
+        "Country-wide Data Aggregated by " + (stateView ? "State" : "City");
     updateMap();
 };
 const setMobile = function(m) {
     displayMobile = m;
     updateMap();
     //updateMap();
-    document.querySelector("#selected_favicon_display").innerHTML = displayMobile ? "Mobile Data" : "Non-Mobile Data";
+    document.querySelector("#selected_favicon_display").innerHTML =
+        displayMobile ? "Mobile Data" : "Non-Mobile Data";
 };
 
 const updateRTTLeaderBoards = () => {
@@ -462,13 +486,13 @@ const updateMap = function(){
 
 const updatesStateMap = function (div, stateData, scaledGradient) {
 
-    mapSvg.selectAll("path").remove()
-    mapSvg.selectAll("circle").remove();
+    stateMapSvg.selectAll("path").remove()
+    stateMapSvg.selectAll("circle").remove();
 
     d3.json("us-named.topojson").then(us => {
         const counties = topojson.feature(us, us.objects.counties);
         const states = topojson.feature(us, us.objects.states);
-        mapSvg.selectAll("path")
+        stateMapSvg.selectAll("path")
             .data(states.features)
             .enter()
             .append("path")
@@ -500,7 +524,7 @@ const updatesStateMap = function (div, stateData, scaledGradient) {
             });
 
 
-        mapSvg.append("path")
+        stateMapSvg.append("path")
             .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
             .attr("fill", "none")
             .attr("stroke", "white")
@@ -513,12 +537,11 @@ const updatesStateMap = function (div, stateData, scaledGradient) {
 }
 
 const setupCityMap = function () {
-    mapSvg.selectAll("*").remove();
     //mapSvg.selectAll("circle").remove();
 
     d3.json("us-named.topojson").then(us => {
         const counties = topojson.feature(us, us.objects.counties);
-        mapSvg.selectAll("path")
+        cityMapSvg.selectAll("path")
             .data(counties.features)
             .enter()
             .insert("path")
@@ -528,7 +551,7 @@ const setupCityMap = function () {
             });
 
 
-        mapSvg.insert("path")
+        cityMapSvg.insert("path")
             .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
             .attr("fill", "none")
             .attr("stroke", "white")
@@ -540,7 +563,7 @@ const setupCityMap = function () {
 
 // data = [{favicon: "facebook.com", avg_rtt: 1.1, city: "Boston", latitude: "0.0", longitude: "0.0"}]
 const updatesCityMap = function (div, filtered, scaledGradient) {
-    const mapPoint = mapSvg.selectAll("circle").data(filtered);
+    const mapPoint = cityMapSvg.selectAll("circle").data(filtered);
     //mapPoint.exit().remove();
     mapPoint.enter()
         .append("circle")

@@ -262,5 +262,5 @@ document.body.onload = () => {
 	data_display.initializeBar();
 	data_display.displayBar(zero_bar);
 	data_display.displayBar(zero_bar); // Note: bar chart has an issue where it doesn't display first call
-	data_display.setupMap(800, 500);
+	data_display.setupMap(800, 450);
 };
