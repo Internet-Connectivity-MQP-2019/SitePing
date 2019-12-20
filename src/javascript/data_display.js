@@ -502,7 +502,7 @@ const updatesStateMap = function (div, stateData, scaledGradient) {
                 let stateName = d.properties.name
                 if(Object.keys(stateData).includes(stateName))
                     return scaledGradient(stateData[d.properties.name])
-                return "#0367A6"
+                return "#7f7f7f"
             }).on("mouseover", d => {
             div.transition()
                 .duration(200)
