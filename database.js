@@ -116,14 +116,15 @@ module.exports = function () {
 					}
 				}, {
 					$group: {
-						"_id": {"city": {$toLower: "$city"}, "state": "$state", "isMobile": "$isMobile"},
+						"_id": {"city": {$toLower: {$ifNull: ["$alt_city", "$city"]}}, "state": {$ifNull: ["$alt_state", "$state"]}, "isMobile": "$isMobile"},
 						count: {$sum: 1},
-						latitude: {$avg: "$latitude"},
-						longitude: {$avg: "$longitude"},
+						latitude: {$avg: {$ifNull: ["$alt_latitude", "$latitude"]}},
+						longitude: {$avg: {$ifNull: ["$alt_longitude", "$longitude"]}},
 						avg_rtt: {$avg: "$rtt"},
 					}
 				}])
 					.toArray((err, res) => {
+						console.log(err);
 						res.forEach(d => {
 							d.city = d._id.city;
 							d.isMobile = d._id.isMobile;

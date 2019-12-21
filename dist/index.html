@@ -138,29 +138,58 @@
 					<button class="btn btn-dark" id="view_by_city" type="button">View By City</button>
 				</div>
 				<br>
-				<div class="row">
-					<div class="col-sm-12 col-lg-6">
-						<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average non-mobile RTT)</h2>
-						<br>
-						<ol id="cityNonMobileRTTLeaderboard"></ol>
+				<div id="cityRTTLists">
+					<div class="row">
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average non-mobile RTT)</h2>
+							<br>
+							<ol id="cityNonMobileRTTLeaderboard"></ol>
+						</div>
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average mobile RTT)</h2>
+							<br>
+							<ol id="cityMobileRTTLeaderboard"></ol>
+						</div>
 					</div>
-					<div class="col-sm-12 col-lg-6">
-						<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average mobile RTT)</h2>
-						<br>
-						<ol id="cityMobileRTTLeaderboard"></ol>
+					<br>
+					<div class="row">
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Worst 5 Cities (by average non-mobile RTT)</h2>
+							<br>
+							<ol id="cityNonMobileRTTLoserboard"></ol>
+						</div>
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Worst 5 Cities (by average mobile RTT)</h2>
+							<br>
+							<ol id="cityMobileRTTLoserboard"></ol>
+						</div>
 					</div>
 				</div>
-				<br>
-				<div class="row">
-					<div class="col-sm-12 col-lg-6">
-						<h2 style="font-size: 18px; font-weight: bold;">Worst 5 Cities (by average non-mobile RTT)</h2>
-						<br>
-						<ol id="cityNonMobileRTTLoserboard"></ol>
+				<div id="stateRTTLists" style="display: none">
+					<div class="row">
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average non-mobile RTT)</h2>
+							<br>
+							<ol id="stateNonMobileRTTLeaderboard"></ol>
+						</div>
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Top 5 Cities (by average mobile RTT)</h2>
+							<br>
+							<ol id="stateMobileRTTLeaderboard"></ol>
+						</div>
 					</div>
-					<div class="col-sm-12 col-lg-6">
-						<h2 style="font-size: 18px; font-weight: bold;">Worst 5 Cities (by average mobile RTT)</h2>
-						<br>
-						<ol id="cityMobileRTTLoserboard"></ol>
+					<br>
+					<div class="row">
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Worst 5 Cities (by average non-mobile RTT)</h2>
+							<br>
+							<ol id="stateNonMobileRTTLoserboard"></ol>
+						</div>
+						<div class="col-sm-12 col-lg-6">
+							<h2 style="font-size: 18px; font-weight: bold;">Worst 5 Cities (by average mobile RTT)</h2>
+							<br>
+							<ol id="stateMobileRTTLoserboard"></ol>
+						</div>
 					</div>
 				</div>
 				<br>

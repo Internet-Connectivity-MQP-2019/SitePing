@@ -356,6 +356,7 @@ const setStateView = function (s) {
 	updateMap();
 	updateMap();
 };
+
 const setMobile = function (m) {
 	displayMobile = m;
 	updateMap();
@@ -444,12 +445,10 @@ const updateMap = function () {
 
 	const filteredMobile = data.filter(d => d.isMobile === displayMobile);
 
-
 	if (stateView === true) {
-
-		let rawDataDict = {};
-		let stateData = [];
-		let finalStateDataDict = {};
+		const rawDataDict = {};
+		const stateData = [];
+		const finalStateDataDict = {};
 		for (let i = 0; i < filteredMobile.length; i++) {
 			if (rawDataDict[filteredMobile[i]._id.state] === undefined) {
 				rawDataDict[filteredMobile[i]._id.state] = [];
@@ -457,22 +456,17 @@ const updateMap = function () {
 			rawDataDict[filteredMobile[i]._id.state].push(filteredMobile[i].avg_rtt);
 		}
 
-		let min = 1000;
-		let max = 0;
 		Object.keys(rawDataDict).forEach(stateName => {
 			let sum = 0;
-			let count = 0;
-			let currentData = rawDataDict[stateName];
+			const currentData = rawDataDict[stateName];
+			const count = currentData.length;
 
 			for (let i = 0; i < currentData.length; i++) {
 				sum = sum + currentData[i];
-				count++;
 			}
 
 			const stateAvg = sum / count;
 
-			if (stateAvg < min) min = stateAvg;
-			if (stateAvg > max) max = stateAvg;
 			stateData.push({"avg_rtt": stateAvg, "state_name": stateLookup[stateName]});
 			finalStateDataDict[stateLookup[stateName]] = stateAvg
 		});
