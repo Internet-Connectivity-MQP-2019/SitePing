@@ -2,8 +2,6 @@ const MaxMind = require('@maxmind/geoip2-node').Reader;
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb+srv://" + process.env.DB_USER + ":" + process.env.DB_PASS + "@faviconmap-j8xwi.mongodb.net/FaviconMap?retryWrites=true&w=majority&authSource=admin";
-const ip_info_url = "https://ipinfo.io/{ip}/json?token=" + process.env.IP_INFO_TOKEN;
-
 module.exports = function () {
 	const client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
@@ -41,7 +39,7 @@ module.exports = function () {
 				} else reject("Reverse Geocode lookup failed with API status code " + request.status + ": " + request.responseText);
 			};
 
-			const url = 'https://geoservices.tamu.edu/Services/ReverseGeocoding/WebService/v04_01/Rest/?' +
+			let url = 'https://geoservices.tamu.edu/Services/ReverseGeocoding/WebService/v04_01/Rest/?' +
 				'apiKey=efda2ed783e748239c3406235a586f43&' +
 				'version=4.1&' +
 				'lat=' + latitude + '&' +
@@ -59,95 +57,16 @@ module.exports = function () {
 			MaxMind.open('GeoIP2-City.mmdb').then(reader => {
 				let data = reader.city(ip);
 				if (!ip) reject("MaxMind lookup failed! No IP for data[0]");
-
-				const request = new XMLHttpRequest();
-				request.onload = () => {
-					if (request.status >= 200 && request.status < 400) {
-						const alt_data = JSON.parse(request.responseText);
-						resolve({
-							latitude: data.location.latitude,
-							longitude: data.location.longitude,
-							city: data.city.names.en,
-							state: data.subdivisions[0].isoCode,
-							country: data.country.isoCode,
-							alt_city: alt_data['city'],
-							alt_state: stateList[alt_data['region']],
-							alt_latitude: parseFloat(alt_data['loc'].split(",")[0]),
-							alt_longitude: parseFloat(alt_data['loc'].split(",")[1])
-						});
-					} else {
-						console.log("Alternate Geolocation lookup failed with status code " + request.status + ": " + request.responseText);
-						resolve({
-							latitude: data.location.latitude,
-							longitude: data.location.longitude,
-							city: data.city.names.en,
-							state: data.subdivisions[0].isoCode,
-							country: data.country.isoCode,
-						});
-					}
-
-					const url = ip_info_url.replace("{ip}", ip);
-					request.open('GET', url, true);
-					request.responseType = 'json';
-					request.send();
-				}
+				resolve({
+					latitude: data.location.latitude,
+					longitude: data.location.longitude,
+					city: data.city.names.en,
+					state: data.subdivisions[0].isoCode,
+					country: data.country.isoCode
+				});
 			}).catch(error => reject("MaxMind lookup failed! " + error))
 		})
 	}
-
-	const stateList = {
-		'Arizona': 'AZ',
-		'Alabama': 'AL',
-		'Alaska': 'AK',
-		'Arkansas': 'AR',
-		'California': 'CA',
-		'Colorado': 'CO',
-		'Connecticut': 'CT',
-		'Delaware': 'DE',
-		'Washington, D.C.': 'DC',
-		'Florida': 'FL',
-		'Georgia': 'GA',
-		'Hawaii': 'HI',
-		'Idaho': 'ID',
-		'Illinois': 'IL',
-		'Indiana': 'IN',
-		'Iowa': 'IA',
-		'Kansas': 'KS',
-		'Kentucky': 'KY',
-		'Louisiana': 'LA',
-		'Maine': 'ME',
-		'Maryland': 'MD',
-		'Massachusetts': 'MA',
-		'Michigan': 'MI',
-		'Minnesota': 'MN',
-		'Mississippi': 'MS',
-		'Missouri': 'MO',
-		'Montana': 'MT',
-		'Nebraska': 'NE',
-		'Nevada': 'NV',
-		'New Hampshire': 'NH',
-		'New Jersey': 'NJ',
-		'New Mexico': 'NM',
-		'New York': 'NY',
-		'North Carolina': 'NC',
-		'North Dakota': 'ND',
-		'Ohio': 'OH',
-		'Oklahoma': 'OK',
-		'Oregon': 'OR',
-		'Pennsylvania': 'PA',
-		'Rhode Island': 'RI',
-		'South Carolina': 'SC',
-		'South Dakota': 'SD',
-		'Tennessee': 'TN',
-		'Texas': 'TX',
-		'Utah': 'UT',
-		'Vermont': 'VT',
-		'Virginia': 'VA',
-		'Washington': 'WA',
-		'West Virginia': 'WV',
-		'Wisconsin': 'WI',
-		'Wyoming': 'WY'
-	};
 
 	function getLocation(data) {
 		return new Promise((resolve) => {
@@ -179,10 +98,6 @@ module.exports = function () {
 						data[i].longitude = location.longitude;
 						data[i].city = location.city;
 						data[i].state = location.state;
-						data[i].alt_latitude = location.alt_latitude;
-						data[i].alt_longitude = location.alt_longitude;
-						data[i].alt_city = location.alt_city;
-						data[i].alt_state = location.alt_state;
 						data[i].country = location.country;
 					}
 					PingsCollection().then(col => col.insertMany(data).then(resolve));
@@ -201,11 +116,7 @@ module.exports = function () {
 					}
 				}, {
 					$group: {
-						"_id": {
-							"city": {$toLower: {$ifNull: ["$alt_city", "$city"]}},
-							"state": {$ifNull: ["$alt_state", "$state"]},
-							"isMobile": "$isMobile"
-						},
+						"_id": {"city": {$toLower: {$ifNull: ["$alt_city", "$city"]}}, "state": {$ifNull: ["$alt_state", "$state"]}, "isMobile": "$isMobile"},
 						count: {$sum: 1},
 						latitude: {$avg: {$ifNull: ["$alt_latitude", "$latitude"]}},
 						longitude: {$avg: {$ifNull: ["$alt_longitude", "$longitude"]}},
