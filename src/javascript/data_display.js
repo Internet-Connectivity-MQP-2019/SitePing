@@ -367,7 +367,7 @@ const setMobile = function (m) {
 
 const updateRTTLeaderBoards = () => {
 	const sortRTTDescending = (a, b) => a.avg_rtt - b.avg_rtt;
-	const sortRTTAscending = (a, b) => a.avg_rtt - b.avg_rtt;
+	const sortRTTAscending = (a, b) => b.avg_rtt - a.avg_rtt;
 
 	const filterIsMobile = d => d.isMobile === true && d.city !== "";
 	const filterIsNotMobile = d => d.isMobile === false && d.city !== "";
