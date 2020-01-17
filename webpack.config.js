@@ -3,7 +3,8 @@ const path = require('path');
 
 const config = {
   entry: {
-    main: ['@babel/polyfill', './src/javascript/index.js']
+    main: ['@babel/polyfill', './src/javascript/index.js'],
+    dns: ['@babel/polyfill', './src/javascript/dns_display.js']
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

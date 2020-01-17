@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mapping Internet Connectivity</title>
+	<meta charset="utf-8">
+	<link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" rel="stylesheet">
+	<link href="css/styles.css" rel="stylesheet">
+
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-153520136-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<div id="app">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-sm-12">
+				<h1>DNS Data</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12 col-lg-4 offset-lg-2">
+				<select id="map_select_1">
+					<option value="rtt" selected>RTT</option>
+					<option value="area">Area</option>
+					<option value="population_2019">Population</option>
+					<option value="gdp_2018">GDP</option>
+					<option value="employment">SW Engineer Employment</option>
+					<option value="employment_per_1000">SW Engineer Employment Density</option>
+				</select>
+				<div id="map_div_1">
+				</div>
+			</div>
+			<div class="col-sm-12 col-lg-4">
+				<select id="map_select_3">
+					<option value="rtt" selected>RTT</option>
+					<option value="area">Area</option>
+					<option value="population_2019">Population</option>
+					<option value="gdp_2018">GDP</option>
+					<option value="employment">SW Engineer Employment</option>
+					<option value="employment_per_1000">SW Engineer Employment Density</option>
+				</select>
+				<div id="map_div_3">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12 col-lg-4 offset-lg-4">
+				<div id="map_div_2">
+				</div>
+			</div>
+		</div>
+		<div class="row align-items-center h-100">
+			<div class="col col-lg-6 offset-lg-3 col-sm-12 text-center">
+				<p>© 2019-2020 <a href = "https://www.wpi.edu/">Worcester Polytechnic Institute</a></p>
+				<p>Questions? Email us at <a href="mailto:gr-faviconping@wpi.edu">gr-faviconping@wpi.edu</a>.</p>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="dns-bundle.js"></script>
+<script crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script crossorigin="anonymous" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script crossorigin="anonymous" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
