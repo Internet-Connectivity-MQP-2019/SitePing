@@ -4,9 +4,9 @@ import * as topojson from 'topojson';
 
 const d3 = Object.assign(d3Base, {group});
 
-let state_data = null;
+let us_named_topojson = null;
 d3.json("us-named.topojson").then(us => {
-	state_data = topojson.feature(us, us.objects.states);
+	us_named_topojson = topojson.feature(us, us.objects.states);
 });
 
 
@@ -36,11 +36,11 @@ const createStateMap = (div_id, width, height, scale, defaultColor) => {
 		.attr("height", height);
 
 	// Allow initialization of the state data
-	while (state_data === null) {}
+	while (us_named_topojson === null) {}
 
 	// Draw the map with the default color
 	svg.selectAll("path")
-		.data(state_data.features)
+		.data(us_named_topojson.features)
 		.enter()
 		.append("path")
 		.attr("d", path)
@@ -74,7 +74,7 @@ const updateStateMap = (div_id, svg, colorGradient, stateDictionary) => {
 
 	// Redraw elements
 	svg.selectAll("path")
-		.data(state_data.features)
+		.data(us_named_topojson.features)
 		.enter()
 		.append("path")
 		.attr("d", path)
